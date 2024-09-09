@@ -8,9 +8,16 @@ spring:
       host: localhost
       port: 27017
       database: stocktracker
+    redis:
+      host: localhost
+      port: 6379
+      password: sa
+  cache:
+    redis:
+      time-to-live: 60000
 
 stock:
   client:
     brapi:
       url: https://brapi.dev/api/quote
-      token: fUCHVmU8MPj2728AADkiTLL
+      token: 5o2DQc1FAK8rq39UbUMxV7

@@ -6,6 +6,7 @@ import com.pdev.stocktracker.client.response.BrapiStockResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -20,6 +21,7 @@ public class FindStockDetailService {
 
     private final BrapiClient brapiClient;
 
+    @Cacheable(value = "acao", key="#stock")
     public Optional<BrapiStockDataResponse> getBrapiStockDetail(String stock) {
         log.info("Consultando informações da ação: {} na Brapi", stock);
         BrapiStockResponse brapiStockResponse = brapiClient.getStock(stock, token);
