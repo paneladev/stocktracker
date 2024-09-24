@@ -20,4 +20,7 @@ stock:
   client:
     brapi:
       url: https://brapi.dev/api/quote
-      token: 5o2DQc1FAK8rq39UbUMxV7
+      token: mt2pEx3iFhBXc8zXRbDgke
+
+security:
+  secretLoginKey: 'a-minha-chave-secreta'
