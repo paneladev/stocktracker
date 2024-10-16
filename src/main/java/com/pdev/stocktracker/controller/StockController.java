@@ -8,6 +8,8 @@ import com.pdev.stocktracker.entity.Stock;
 import com.pdev.stocktracker.entity.StockPurchase;
 import com.pdev.stocktracker.mapper.StockMapper;
 import com.pdev.stocktracker.service.StockService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.util.Pair;
 import org.springframework.http.HttpStatus;
@@ -25,6 +27,7 @@ public class StockController {
 
     private final StockService stockService;
 
+    @Operation(security = @SecurityRequirement(name = "bearerAuth"))
     @PostMapping
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<StockResponse> savePurchase(@RequestBody StockRequest request) {
@@ -33,6 +36,7 @@ public class StockController {
         return ResponseEntity.status(HttpStatus.CREATED).body(StockMapper.toStockResponse(savedStock));
     }
 
+    @Operation(security = @SecurityRequirement(name = "bearerAuth"))
     @PostMapping("/add")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<Stock> addPurchase(@RequestBody StockAddPurchaseRequest request) {
@@ -44,6 +48,7 @@ public class StockController {
         }
     }
 
+    @Operation(security = @SecurityRequirement(name = "bearerAuth"))
     @GetMapping
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<List<StockResponse>> getStocks() {
@@ -54,6 +59,7 @@ public class StockController {
         return ResponseEntity.ok(response);
     }
 
+    @Operation(security = @SecurityRequirement(name = "bearerAuth"))
     @GetMapping("/detail/{stockId}")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<List<StockPurchaseResponse>> getPurchasesByStockId(@PathVariable String stockId) {
@@ -69,6 +75,7 @@ public class StockController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    @Operation(security = @SecurityRequirement(name = "bearerAuth"))
     @DeleteMapping("{stockId}")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<Void> deleteStock(@PathVariable String stockId) {
