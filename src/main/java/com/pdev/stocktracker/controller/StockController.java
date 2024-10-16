@@ -32,7 +32,7 @@ public class StockController {
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<StockResponse> savePurchase(@RequestBody StockRequest request) {
         Pair<Stock, StockPurchase> stock = StockMapper.toStock(request);
-        Stock savedStock = stockService.savePurchase(stock.getFirst(), stock.getSecond());
+        Stock savedStock = stockService.saveStock(stock.getFirst(), stock.getSecond());
         return ResponseEntity.status(HttpStatus.CREATED).body(StockMapper.toStockResponse(savedStock));
     }
 

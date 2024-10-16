@@ -24,21 +24,32 @@ public class StockService {
     private final FindStockDetailService findStockDetailService;
 
     @Transactional
-    public Stock savePurchase(Stock stock, StockPurchase stockPurchase) {
+    public Stock saveStock(Stock stock, StockPurchase stockPurchase) {
+        String userId = SecurityContextData.getUserData().getUserId();
+
+        Optional<Stock> optStock = stockRepository.findByStockAndUserId(stock.getStock(), userId);
+        if (optStock.isPresent()) {
+            Stock savedStock = optStock.get();
+            return this.savePurchase(savedStock, stockPurchase);
+        }
+
         StockPurchase savedStockPurchased = stockPurchaseRepository.save(stockPurchase);
-        stock.setUser(User.builder().id(SecurityContextData.getUserData().getUserId()).build());
+        stock.setUser(User.builder().id(userId).build());
         stock.setPurchases(List.of(savedStockPurchased));
+        return stockRepository.save(stock);
+    }
+
+    private Stock savePurchase(Stock stock, StockPurchase stockPurchase) {
+        StockPurchase savedStockPurchased = stockPurchaseRepository.save(stockPurchase);
+        stock.getPurchases().add(savedStockPurchased);
         return stockRepository.save(stock);
     }
 
     @Transactional
     public Stock addPurchase(String stockId, StockPurchase stockPurchase) {
-        return stockRepository.findById(stockId)
-                .map(stock -> {
-                    StockPurchase savedStockPurchased = stockPurchaseRepository.save(stockPurchase);
-                    stock.getPurchases().add(savedStockPurchased);
-                    return stockRepository.save(stock);
-                }).orElseThrow(() -> new IllegalArgumentException("Cannot find a stock."));
+        return stockRepository.findByIdAndUserId(stockId, SecurityContextData.getUserData().getUserId())
+                .map(stock -> savePurchase(stock, stockPurchase))
+                .orElseThrow(() -> new IllegalArgumentException("Cannot find a stock."));
     }
 
     public List<Stock> findAll() {
@@ -54,7 +65,7 @@ public class StockService {
     }
 
     public Optional<Stock> findById(String id) {
-        return stockRepository.findByIdAndUser(id, User.builder().id(SecurityContextData.getUserData().getUserId()).build());
+        return stockRepository.findByIdAndUserId(id, SecurityContextData.getUserData().getUserId());
     }
 
     @Transactional

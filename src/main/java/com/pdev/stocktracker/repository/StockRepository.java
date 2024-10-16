@@ -13,5 +13,7 @@ public interface StockRepository extends MongoRepository<Stock, String> {
 
     List<Stock> findByUser(User user);
 
-    Optional<Stock> findByIdAndUser(String id, User user);
+    Optional<Stock> findByIdAndUserId(String id, String userId);
+
+    Optional<Stock> findByStockAndUserId(String stock, String userId);
 }
