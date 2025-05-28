@@ -7,6 +7,7 @@ import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
@@ -30,5 +31,7 @@ public class Stock {
 
     @DBRef
     private User user;
+
+    private LocalDateTime createdAt;
 
 }
