@@ -3,6 +3,7 @@ package com.pdev.stocktracker.controller;
 import com.pdev.stocktracker.controller.request.RegisterUserRequest;
 import com.pdev.stocktracker.entity.Role;
 import com.pdev.stocktracker.entity.User;
+import com.pdev.stocktracker.exception.ResourceAlreadyExistsException;
 import com.pdev.stocktracker.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -22,6 +23,11 @@ public class RegisterController {
     @PostMapping
     public ResponseEntity<Void> register(@RequestHeader(value = "isAdmin", required = false) boolean isAdmin,
                                          @RequestBody RegisterUserRequest request) {
+
+        if (repository.existsByEmail(request.getEmail())) {
+            throw new ResourceAlreadyExistsException("Email já cadastrado, email: " + request.getEmail());
+        }
+
         User newUser = User.builder()
                 .name(request.getNome())
                 .email(request.getEmail())
