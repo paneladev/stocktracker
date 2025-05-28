@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -27,15 +28,16 @@ public class StockService {
     public Stock saveStock(Stock stock, StockPurchase stockPurchase) {
         String userId = SecurityContextData.getUserData().getUserId();
 
-        Optional<Stock> optStock = stockRepository.findByStockAndUserId(stock.getStock(), userId);
-        if (optStock.isPresent()) {
-            Stock savedStock = optStock.get();
-            return this.savePurchase(savedStock, stockPurchase);
-        }
+        stockRepository.findByStockAndUserId(stock.getStock(), userId)
+                .ifPresent(existingStock -> { throw new IllegalArgumentException("Stock already exists."); });
 
+        stockPurchase.setCreatedAt(LocalDateTime.now());
         StockPurchase savedStockPurchased = stockPurchaseRepository.save(stockPurchase);
+
         stock.setUser(User.builder().id(userId).build());
         stock.setPurchases(List.of(savedStockPurchased));
+        stock.setCreatedAt(LocalDateTime.now());
+
         return stockRepository.save(stock);
     }
 
