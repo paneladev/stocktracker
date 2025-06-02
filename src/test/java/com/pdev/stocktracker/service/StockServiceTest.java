@@ -3,6 +3,7 @@ package com.pdev.stocktracker.service;
 import com.pdev.stocktracker.config.JWTUserData;
 import com.pdev.stocktracker.entity.Stock;
 import com.pdev.stocktracker.entity.StockPurchase;
+import com.pdev.stocktracker.exception.ResourceAlreadyExistsException;
 import com.pdev.stocktracker.repository.StockPurchaseRepository;
 import com.pdev.stocktracker.repository.StockRepository;
 import org.junit.jupiter.api.Assertions;
@@ -113,7 +114,7 @@ class StockServiceTest {
                 .thenReturn(Optional.of(stock));
 
         // Action
-        IllegalArgumentException exception = Assertions.assertThrows(IllegalArgumentException.class,
+        ResourceAlreadyExistsException exception = Assertions.assertThrows(ResourceAlreadyExistsException.class,
                 () -> {
                     stockService.saveStock(stock, stockPurchase);
                 });

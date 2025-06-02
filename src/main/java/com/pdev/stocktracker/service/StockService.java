@@ -5,6 +5,7 @@ import com.pdev.stocktracker.config.SecurityContextData;
 import com.pdev.stocktracker.entity.Stock;
 import com.pdev.stocktracker.entity.StockPurchase;
 import com.pdev.stocktracker.entity.User;
+import com.pdev.stocktracker.exception.ResourceAlreadyExistsException;
 import com.pdev.stocktracker.repository.StockPurchaseRepository;
 import com.pdev.stocktracker.repository.StockRepository;
 import lombok.RequiredArgsConstructor;
@@ -29,7 +30,7 @@ public class StockService {
         String userId = SecurityContextData.getUserData().getUserId();
 
         stockRepository.findByStockAndUserId(stock.getStock(), userId)
-                .ifPresent(existingStock -> { throw new IllegalArgumentException("Stock already exists."); });
+                .ifPresent(existingStock -> { throw new ResourceAlreadyExistsException("Stock already exists."); });
 
         stockPurchase.setCreatedAt(LocalDateTime.now());
         StockPurchase savedStockPurchased = stockPurchaseRepository.save(stockPurchase);
