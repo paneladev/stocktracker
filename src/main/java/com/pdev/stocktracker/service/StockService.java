@@ -39,7 +39,10 @@ public class StockService {
         stock.setPurchases(List.of(savedStockPurchased));
         stock.setCreatedAt(LocalDateTime.now());
 
-        return stockRepository.save(stock);
+        Stock savedStock = stockRepository.save(stock);
+        savedStock.setPrice(stockPurchase.getPrice());
+
+        return savedStock;
     }
 
     private Stock savePurchase(Stock stock, StockPurchase stockPurchase) {
