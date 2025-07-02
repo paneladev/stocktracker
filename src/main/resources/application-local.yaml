@@ -4,9 +4,9 @@ server:
 spring:
   data:
     mongodb:
-      uri: ${MONGODB_URI}
+      uri: mongodb://localhost:27017/stocktracker
     redis:
-      url: ${REDIS_URL}
+      url: redis://:sa@localhost:6379
   cache:
     redis:
       time-to-live: 60000
@@ -20,8 +20,8 @@ springdoc:
 stock:
   client:
     brapi:
-      url: ${STOCK_CLIENT_BRAPI_URL}
-      token: ${STOCK_CLIENT_BRAPI_TOKEN}
+      url: https://brapi.dev/api/quote
+      token: token
 
 security:
-  secretLoginKey: ${SECURITY_SECRET_LOGIN_KEY}
+  secretLoginKey: 'a-minha-chave-secreta'
