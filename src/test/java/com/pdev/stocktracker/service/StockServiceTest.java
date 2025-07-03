@@ -20,8 +20,6 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 @ExtendWith(MockitoExtension.class)
 class StockServiceTest {
 
@@ -68,12 +66,16 @@ class StockServiceTest {
         Mockito.when(stockRepository.findByStockAndUserId(stock.getStock(), mockUser.getUserId()))
                 .thenReturn(Optional.empty());
         Mockito.when(stockPurchaseRepository.save(stockPurchase)).thenReturn(stockPurchase);
+        Mockito.when(stockRepository.save(stock)).thenReturn(stock);
 
 
         // Action
-        stockService.saveStock(stock, stockPurchase);
+        Stock stockSaved = stockService.saveStock(stock, stockPurchase);
 
         // Assert
+
+        Assertions.assertNotNull(stockSaved);
+        Assertions.assertEquals(stock.getPrice(), stockPurchase.getPrice());
 
         Mockito.verify(stockRepository)
                 .findByStockAndUserId(stock.getStock(), mockUser.getUserId());

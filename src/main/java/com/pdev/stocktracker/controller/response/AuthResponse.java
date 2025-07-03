@@ -11,5 +11,8 @@ public class AuthResponse {
     @JsonProperty("access_token")
     private String accessToken;
 
+    @JsonProperty("expires_in")
+    private Long expiresIn;
+
     private String nome;
 }

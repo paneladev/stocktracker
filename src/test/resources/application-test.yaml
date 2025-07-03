@@ -1,0 +1,18 @@
+spring:
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/stocktracker
+    redis:
+      url: redis://:sa@localhost:6379
+  cache:
+    redis:
+      time-to-live: 60000
+
+stock:
+  client:
+    brapi:
+      url: http://localhost:8080/brapi
+      token: token
+
+security:
+  secretLoginKey: chave-secreta
