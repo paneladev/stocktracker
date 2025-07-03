@@ -6,6 +6,7 @@ import com.pdev.stocktracker.entity.Stock;
 import com.pdev.stocktracker.entity.StockPurchase;
 import com.pdev.stocktracker.entity.User;
 import com.pdev.stocktracker.exception.ResourceAlreadyExistsException;
+import com.pdev.stocktracker.exception.ResourceNotFoundException;
 import com.pdev.stocktracker.repository.StockPurchaseRepository;
 import com.pdev.stocktracker.repository.StockRepository;
 import lombok.RequiredArgsConstructor;
@@ -57,7 +58,7 @@ public class StockService {
     public StockPurchase addPurchase(String stockId, StockPurchase stockPurchase) {
         return stockRepository.findByIdAndUserId(stockId, SecurityContextData.getUserData().getUserId())
                 .map(stock -> savePurchase(stock, stockPurchase))
-                .orElseThrow(() -> new IllegalArgumentException("Cannot find a stock."));
+                .orElseThrow(() -> new ResourceNotFoundException("Stock not found."));
     }
 
     public List<Stock> findAll() {
@@ -72,8 +73,9 @@ public class StockService {
         return stocks;
     }
 
-    public Optional<Stock> findById(String id) {
-        return stockRepository.findByIdAndUserId(id, SecurityContextData.getUserData().getUserId());
+    public Stock findById(String id) {
+        return stockRepository.findByIdAndUserId(id, SecurityContextData.getUserData().getUserId())
+                .orElseThrow(() -> new ResourceNotFoundException("Stock not found."));
     }
 
     @Transactional

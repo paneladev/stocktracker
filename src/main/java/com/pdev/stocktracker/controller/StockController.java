@@ -19,7 +19,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/stock")
@@ -41,12 +40,8 @@ public class StockController {
     @PostMapping("/add")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<StockPurchaseResponse> addPurchase(@Valid @RequestBody StockAddPurchaseRequest request) {
-        try {
-            StockPurchase stockPurchase = stockService.addPurchase(request.getStockId(), StockMapper.toStockPurchase(request));
-            return ResponseEntity.ok(StockMapper.stockDetailResponse(stockPurchase, null));
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.unprocessableEntity().build();
-        }
+        StockPurchase stockPurchase = stockService.addPurchase(request.getStockId(), StockMapper.toStockPurchase(request));
+        return ResponseEntity.ok(StockMapper.stockDetailResponse(stockPurchase, null));
     }
 
     @Operation(security = @SecurityRequirement(name = "bearerAuth"))
@@ -64,30 +59,19 @@ public class StockController {
     @GetMapping("/detail/{stockId}")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<List<StockPurchaseResponse>> getPurchasesByStockId(@PathVariable String stockId) {
-        return stockService.findById(stockId)
-                .map(stock -> {
-                    final List<StockPurchaseResponse> stockPurchaseResponseList = stock.getPurchases()
-                            .stream()
-                            .map(purchase -> StockMapper.stockDetailResponse(purchase, stock.getStock()))
-                            .toList();
-
-                    return ResponseEntity.ok(stockPurchaseResponseList);
-                })
-                .orElse(ResponseEntity.notFound().build());
+        Stock stock = stockService.findById(stockId);
+        List<StockPurchaseResponse> stockPurchaseResponseList = stock.getPurchases().stream()
+                .map(purchase -> StockMapper.stockDetailResponse(purchase, stock.getStock()))
+                .toList();
+        return ResponseEntity.ok(stockPurchaseResponseList);
     }
 
     @Operation(security = @SecurityRequirement(name = "bearerAuth"))
     @DeleteMapping("{stockId}")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<Void> deleteStock(@PathVariable String stockId) {
-        final Optional<Stock> optStock = stockService.findById(stockId);
-
-        if (optStock.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
-
-        stockService.delete(optStock.get());
-
+        Stock stock = stockService.findById(stockId);
+        stockService.delete(stock);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }

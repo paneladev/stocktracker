@@ -2,6 +2,7 @@ package com.pdev.stocktracker.config;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.pdev.stocktracker.exception.ResourceAlreadyExistsException;
+import com.pdev.stocktracker.exception.ResourceNotFoundException;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.http.HttpStatus;
@@ -56,6 +57,17 @@ public class GlobalExceptionHandler {
                 null
         );
         return new ResponseEntity<>(error, HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler(ResourceNotFoundException.class)
+    protected ResponseEntity<ErrorResponse> handleResourceNotFoundException(ResourceNotFoundException ex) {
+        ErrorResponse error = new ErrorResponse(
+                LocalDateTime.now(),
+                HttpStatus.NOT_FOUND.value(),
+                ex.getMessage(),
+                null
+        );
+        return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
     }
 
     @Getter
