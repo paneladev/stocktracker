@@ -10,10 +10,12 @@ import com.pdev.stocktracker.exception.ResourceNotFoundException;
 import com.pdev.stocktracker.repository.StockPurchaseRepository;
 import com.pdev.stocktracker.repository.StockRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -21,6 +23,9 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class StockService {
+
+    @Value("${stock.client.brapi.active}")
+    private boolean isBrapiActive;
 
     private final StockRepository stockRepository;
     private final StockPurchaseRepository stockPurchaseRepository;
@@ -65,10 +70,25 @@ public class StockService {
         List<Stock> stocks = stockRepository
                 .findByUser(User.builder().id(SecurityContextData.getUserData().getUserId()).build());
 
-        stocks.forEach(stock -> {
-            Optional<BrapiStockDataResponse> brapiStockDetail = findStockDetailService.getBrapiStockDetail(stock.getStock());
-            stock.setPrice(BigDecimal.valueOf(brapiStockDetail.map(BrapiStockDataResponse::getRegularMarketPrice).orElse(0.0)));
-        });
+        if(isBrapiActive) {
+            stocks.forEach(stock -> {
+                Optional<BrapiStockDataResponse> brapiStockDetail = findStockDetailService.getBrapiStockDetail(stock.getStock());
+                stock.setPrice(BigDecimal.valueOf(brapiStockDetail.map(BrapiStockDataResponse::getRegularMarketPrice).orElse(0.0)));
+            });
+        } else {
+            stocks.forEach(stock -> {
+                BigDecimal totalValue = stock.getPurchases().stream()
+                        .map(p -> p.getPrice().multiply(BigDecimal.valueOf(p.getQuantity())))
+                        .reduce(BigDecimal.ZERO, BigDecimal::add);
+                long totalQuantity = stock.getPurchases().stream()
+                        .mapToLong(StockPurchase::getQuantity)
+                        .sum();
+                BigDecimal avgPrice = totalQuantity > 0
+                        ? totalValue.divide(BigDecimal.valueOf(totalQuantity), RoundingMode.HALF_UP)
+                        : BigDecimal.ZERO;
+                stock.setPrice(avgPrice);
+            });
+        }
 
         return stocks;
     }

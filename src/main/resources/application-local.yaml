@@ -20,6 +20,7 @@ springdoc:
 stock:
   client:
     brapi:
+      active: false
       url: https://brapi.dev/api/quote
       token: token
 

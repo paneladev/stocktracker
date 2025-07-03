@@ -20,6 +20,7 @@ springdoc:
 stock:
   client:
     brapi:
+      active: ${STOCK_CLIENT_BRAPI_ACTIVE}
       url: ${STOCK_CLIENT_BRAPI_URL}
       token: ${STOCK_CLIENT_BRAPI_TOKEN}
 
