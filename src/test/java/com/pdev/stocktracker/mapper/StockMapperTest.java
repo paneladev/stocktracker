@@ -114,7 +114,7 @@ class StockMapperTest {
                 .build();
 
         // Action
-        StockPurchaseResponse stockResponse = StockMapper.stockDetailResponse(stockPurchase);
+        StockPurchaseResponse stockResponse = StockMapper.stockDetailResponse(stockPurchase, "QQQ");
 
         // Assertions
         assertNotNull(stockResponse);

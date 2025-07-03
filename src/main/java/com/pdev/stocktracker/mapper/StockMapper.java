@@ -52,8 +52,9 @@ public class StockMapper {
 
     }
 
-    public static StockPurchaseResponse stockDetailResponse(StockPurchase stockPurchase) {
+    public static StockPurchaseResponse stockDetailResponse(StockPurchase stockPurchase, String stock) {
         return StockPurchaseResponse.builder()
+                .stock(stock)
                 .date(stockPurchase.getDate())
                 .quantity(stockPurchase.getQuantity())
                 .price(stockPurchase.getPrice())

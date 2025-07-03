@@ -45,14 +45,16 @@ public class StockService {
         return savedStock;
     }
 
-    private Stock savePurchase(Stock stock, StockPurchase stockPurchase) {
+    private StockPurchase savePurchase(Stock stock, StockPurchase stockPurchase) {
+        stockPurchase.setCreatedAt(LocalDateTime.now());
         StockPurchase savedStockPurchased = stockPurchaseRepository.save(stockPurchase);
         stock.getPurchases().add(savedStockPurchased);
-        return stockRepository.save(stock);
+        stockRepository.save(stock);
+        return savedStockPurchased;
     }
 
     @Transactional
-    public Stock addPurchase(String stockId, StockPurchase stockPurchase) {
+    public StockPurchase addPurchase(String stockId, StockPurchase stockPurchase) {
         return stockRepository.findByIdAndUserId(stockId, SecurityContextData.getUserData().getUserId())
                 .map(stock -> savePurchase(stock, stockPurchase))
                 .orElseThrow(() -> new IllegalArgumentException("Cannot find a stock."));

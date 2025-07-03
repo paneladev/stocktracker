@@ -10,6 +10,7 @@ import com.pdev.stocktracker.mapper.StockMapper;
 import com.pdev.stocktracker.service.StockService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.util.Pair;
 import org.springframework.http.HttpStatus;
@@ -30,7 +31,7 @@ public class StockController {
     @Operation(security = @SecurityRequirement(name = "bearerAuth"))
     @PostMapping
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<StockResponse> savePurchase(@RequestBody StockRequest request) {
+    public ResponseEntity<StockResponse> savePurchase(@Valid @RequestBody StockRequest request) {
         Pair<Stock, StockPurchase> stock = StockMapper.toStock(request);
         Stock savedStock = stockService.saveStock(stock.getFirst(), stock.getSecond());
         return ResponseEntity.status(HttpStatus.CREATED).body(StockMapper.toStockResponse(savedStock));
@@ -39,10 +40,10 @@ public class StockController {
     @Operation(security = @SecurityRequirement(name = "bearerAuth"))
     @PostMapping("/add")
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<Stock> addPurchase(@RequestBody StockAddPurchaseRequest request) {
+    public ResponseEntity<StockPurchaseResponse> addPurchase(@Valid @RequestBody StockAddPurchaseRequest request) {
         try {
-            Stock stock = stockService.addPurchase(request.getStockId(), StockMapper.toStockPurchase(request));
-            return ResponseEntity.ok(stock);
+            StockPurchase stockPurchase = stockService.addPurchase(request.getStockId(), StockMapper.toStockPurchase(request));
+            return ResponseEntity.ok(StockMapper.stockDetailResponse(stockPurchase, null));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.unprocessableEntity().build();
         }
@@ -67,7 +68,7 @@ public class StockController {
                 .map(stock -> {
                     final List<StockPurchaseResponse> stockPurchaseResponseList = stock.getPurchases()
                             .stream()
-                            .map(StockMapper::stockDetailResponse)
+                            .map(purchase -> StockMapper.stockDetailResponse(purchase, stock.getStock()))
                             .toList();
 
                     return ResponseEntity.ok(stockPurchaseResponseList);
