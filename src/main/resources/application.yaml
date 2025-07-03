@@ -5,6 +5,8 @@ spring:
   data:
     mongodb:
       uri: ${MONGODB_URI}
+      ssl:
+        enabled: true
     redis:
       url: ${REDIS_URL}
   cache:
