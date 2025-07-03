@@ -8,8 +8,7 @@ spring:
       ssl:
         enabled: true
         invalid-hostname-allowed: true
-        trust-store-type: PKCS12
-        trust-store: file:/etc/mongo/certs/ca.pem
+        ca-file: /etc/mongo/certs/ca.pem
     redis:
       url: ${REDIS_URL}
   cache:
